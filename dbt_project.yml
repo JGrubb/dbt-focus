@@ -59,8 +59,9 @@ vars:
   
   # AWS-specific configuration
   aws:
-    # Source table
-    billing_table: 'aws_billing.cur_2_0_append_parquet_unified'
+    # Source table configuration
+    billing_schema: 'aws_billing'
+    billing_table: 'cur_2_0_append_parquet_unified'
     
     # Column mappings (defaults from open-finops-stack)
     columns:

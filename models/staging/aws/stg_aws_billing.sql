@@ -6,7 +6,7 @@
 
 with source_data as (
   select * 
-  from {{ source('aws_billing', var('aws')['billing_table'].split('.')[-1]) }}
+  from {{ source('aws_billing', var('aws')['billing_table']) }}
 ),
 
 standardized as (

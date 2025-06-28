@@ -3,10 +3,10 @@ version: 2
 sources:
   - name: aws_billing
     description: "AWS Cost and Usage Report data ingested via open-finops-stack DLT pipeline"
+    schema: "{{ var('aws')['billing_schema'] }}"
     tables:
-      - name: "{{ var('aws')['billing_table'].split('.')[-1] }}"
+      - name: "{{ var('aws')['billing_table'] }}"
         description: "AWS Cost and Usage Report 2.0 data in unified format"
-        schema: "{{ var('aws')['billing_table'].split('.')[0] if '.' in var('aws')['billing_table'] else 'main' }}"
 
 models:
   - name: stg_aws_billing
