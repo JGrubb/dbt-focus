@@ -1,0 +1,92 @@
+version: 2
+
+sources:
+  - name: aws_billing
+    description: "AWS Cost and Usage Report data ingested via open-finops-stack DLT pipeline"
+    tables:
+      - name: "{{ var('aws')['billing_table'].split('.')[-1] }}"
+        description: "AWS Cost and Usage Report 2.0 data in unified format"
+        schema: "{{ var('aws')['billing_table'].split('.')[0] if '.' in var('aws')['billing_table'] else 'main' }}"
+
+models:
+  - name: stg_aws_billing
+    description: "Standardized AWS billing data with consistent column names and provider identifier"
+    columns:
+      - name: bill_billing_period_start_date
+        description: "Start date of the billing period"
+        tests:
+          - not_null
+      - name: bill_billing_period_end_date
+        description: "End date of the billing period"
+        tests:
+          - not_null
+      - name: bill_payer_account_id
+        description: "AWS account ID of the payer account"
+        tests:
+          - not_null
+      - name: line_item_usage_account_id
+        description: "AWS account ID where the usage occurred"
+        tests:
+          - not_null
+      - name: bill_invoice_id
+        description: "Invoice ID for this billing period"
+      - name: product_servicecode
+        description: "AWS service code (e.g., AmazonEC2, AmazonS3)"
+        tests:
+          - not_null
+      - name: product_servicename
+        description: "Human-readable AWS service name"
+      - name: line_item_resource_id
+        description: "Unique identifier for the AWS resource (may be null for some services)"
+      - name: product_region
+        description: "AWS region where the resource is located"
+      - name: product_availability_zone
+        description: "AWS availability zone"
+      - name: line_item_usage_start_date
+        description: "Start timestamp for this usage record"
+        tests:
+          - not_null
+      - name: line_item_usage_end_date
+        description: "End timestamp for this usage record"
+        tests:
+          - not_null
+      - name: line_item_usage_type
+        description: "Type of usage (e.g., BoxUsage:t2.micro)"
+      - name: line_item_usage_amount
+        description: "Quantity of usage"
+        tests:
+          - not_null
+      - name: pricing_unit
+        description: "Unit of measurement for usage"
+      - name: line_item_unblended_cost
+        description: "Unblended cost for this line item in the billing currency"
+        tests:
+          - not_null
+      - name: line_item_blended_cost
+        description: "Blended cost for this line item (used in consolidated billing)"
+      - name: line_item_net_unblended_cost
+        description: "Net unblended cost after applying credits and discounts"
+      - name: pricing_public_on_demand_cost
+        description: "Public on-demand cost without any reserved instance or savings plan discounts"
+      - name: line_item_currency_code
+        description: "Currency code for all cost amounts (e.g., USD, EUR)"
+        tests:
+          - not_null
+      - name: line_item_line_item_type
+        description: "Type of line item (Usage, Tax, Credit, Refund, RIFee, etc.)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Usage', 'Tax', 'Credit', 'Refund', 'RIFee', 'Fee', 'Rounding', 'SPNegBenefit']
+      - name: line_item_line_item_description
+        description: "Detailed description of what this line item represents"
+      - name: line_item_operation
+        description: "AWS operation that generated this cost (e.g., RunInstances, CreateBucket)"
+      - name: resource_tags
+        description: "JSON object containing all resource tags as key-value pairs"
+      - name: provider
+        description: "Cloud provider identifier for multi-cloud unification"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['aws']
